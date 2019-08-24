@@ -8,7 +8,7 @@ exports.client = (req, res) => {
 
 exports.server = (err, req, res, next) => {
   const internalServerError =
-    '<p style="font-size: 10vh; text-align: center;">404!</p>';
+    '<p style="font-size: 10vh; text-align: center;">500!</p>';
 
   res.set("Content-Length", internalServerError.length);
   res.status(500).send(internalServerError);
