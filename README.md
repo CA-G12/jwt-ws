@@ -9,7 +9,7 @@
 
 **Featured npm Packages:**
 
-- [cookie](https://npmjs.com/package/cookie)
+- [cookie-parser](https://www.npmjs.com/package/cookie-parser)
 - [cookie-signature](https://npmjs.com/package/cookie-signature)
 - [jsonwebtoken](https://www.npmjs.com/package/jsonwebtoken)
 
@@ -164,7 +164,7 @@ This JWT is protected from tampering, because it is signed. The payload and head
 
 The full JWT spec is [rather large](https://tools.ietf.org/html/rfc7519), so as fun as it would be to implement it ourselves, let's go with a library.
 
-We will be using [`jsonwebtoken`](https://www.npmjs.com/package/jsonwebtoken), to create our JWTs. I also recommend using [`cookie`](https://npmjs.com/package/cookie) to parse your incoming `req.headers.cookie` header.
+We will be using [`jsonwebtoken`](https://www.npmjs.com/package/jsonwebtoken), to create our JWTs. I also recommend using [`cookie-parser`](https://npmjs.com/package/cookie-parser) to parse your incoming cookies.
 
 Read the docs for both!
 
