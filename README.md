@@ -1,4 +1,8 @@
-# Founders & Coders - JWT Stateless Session Workshop
+# JWT Stateless Session Workshop
+
+Based on FAC [original workshop](https://github.com/foundersandcoders/ws-jwt-stateless-session).
+
+---
 
 **Learning Outcomes:**
 
