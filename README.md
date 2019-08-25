@@ -9,7 +9,7 @@ Based on FAC [original workshop](https://github.com/foundersandcoders/ws-jwt-sta
 - Understand the idea of token-based authentication
 - What is digital signing?
 - What are JSON Web Tokens (JWTs)?
-- How to implement token-based authentication using JWTs and Node
+- How to implement token-based authentication using JWTs and Express
 
 **Featured npm Packages:**
 
