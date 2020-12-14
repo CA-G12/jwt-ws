@@ -14,7 +14,6 @@ Based on FAC [original workshop](https://github.com/foundersandcoders/ws-jwt-sta
 **Featured npm Packages:**
 
 - [cookie-parser](https://www.npmjs.com/package/cookie-parser)
-- [cookie-signature](https://npmjs.com/package/cookie-signature)
 - [jsonwebtoken](https://www.npmjs.com/package/jsonwebtoken)
 
 ## Introduction
