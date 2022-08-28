@@ -90,11 +90,11 @@ You can store the HMAC alongside the original message to verify that the message
 
 This whole 'signed JSON' idea is such a good one that there is an entire open standard associated with it known as [JSON Web Tokens](https://jwt.io/).
 
-JWT uses [base64](https://en.wikipedia.org/wiki/Base64) encoding which is a way of converting binary data into plain text. Encoding _is not_ the same as encrypting so **sensitive information should not be stored within a JWT**. We use JWTs for authentication and transferring data that you don't want to be tampered with.
+JWT uses [base64url](https://en.wikipedia.org/wiki/Base64#URL_applications) encoding which is a way of converting binary data into plain text. Encoding _is not_ the same as encrypting so **sensitive information should not be stored within a JWT**. We use JWTs for authentication and transferring data that you don't want to be tampered with.
 
 **A JWT is just a string**, composed of three sections, joined together by full stops. The sections are:
 
-**1. Header** - base64 encoded object about the type of token (jwt) and the type of hashing algorithm (ie HMAC SHA256).
+**1. Header** - base64url encoded object about the type of token (jwt) and the type of hashing algorithm (ie HMAC SHA256).
 
 ```js
 {
@@ -103,7 +103,7 @@ JWT uses [base64](https://en.wikipedia.org/wiki/Base64) encoding which is a way 
 }
 ```
 
-**2. Payload** - base64 encoded object with your 'claims' in it. Mostly just a fancy name for the data you want to store in your JWT, but it can also hold 'reserved claims', which are some useful standard values, such as `iss (issuer)`, `exp (expiration time)`, `sub (subject)`, and `aud (audience)`.
+**2. Payload** - base64url encoded object with your 'claims' in it. Mostly just a fancy name for the data you want to store in your JWT, but it can also hold 'reserved claims', which are some useful standard values, such as `iss (issuer)`, `exp (expiration time)`, `sub (subject)`, and `aud (audience)`.
 
 ```js
 {
@@ -129,37 +129,40 @@ Here is an example of a JWT:
 
 So to manually build it in Node.js:
 
+Note: base64url first landed in [v15.7.0](https://github.com/nodejs/node/blob/4afcd55274c76f35955cab1ac69f15e9cf4287b6/doc/changelogs/CHANGELOG_V15.md#2021-01-26-version-1570-current-ruyadorno):
+
 ```js
-const base64Encode = str => Buffer.from(str).toString("base64");
+// const base64urlEncode = str => Buffer.from(str).toString("base64url");
+// const base64urlDecode = str => Buffer.from(str, "base64url").toString();
+const base64url = require('base64url');
 
-const base64Decode = str => Buffer.from(str, "base64").toString();
+const createHash = ({ value, secretKey }) =>
+  crypto.createHmac("sha256", secretKey).update(value).digest("base64url");
 
-// Usually two parts:
 const header = {
-  alg: "SHA256", // The hashing algorithm to be used
-  typ: "JWT" // The token 'type'
+  alg: "HS256",
+  typ: "JWT"
 };
 
-// Your 'claims'
 const payload = {
   userId: 99,
-  username: "ada"
+  username: "user"
 };
 
-const encodedHeader = base64Encode(JSON.stringify(header));
-const encodedPayload = base64Encode(JSON.stringify(payload));
+const encodedHeader = base64url(JSON.stringify(header)); // eyJhbGciOiJIUzI1NiIsInR5cCI6IkpXVCJ9
+const encodedPayload = base64url(JSON.stringify(payload)); // eyJ1c2VySWQiOjk5LCJ1c2VybmFtZSI6InVzZXIifQ
 
-const signature = hashFunction(`${encodedHeader}.${encodedPayload}`);
-
-// 'Udcna0ETPpRw5m3po3COjicb_cGJvgtnoLZyLnftaaI'
+const signature = createHash({
+  value: `${encodedHeader}.${encodedPayload}`,
+  secretKey: "this is a secret",
+});
+// zeTCbWm2-Lpkoityi6Zll6vX8Ahs2x1J0Jp0tbPp_G0
 
 const jwt = `${encodedHeader}.${encodedPayload}.${signature}`;
-
-// Result!
-// 'eyJhbGciOiJIUzI1NiIsInR5cCI6IkpXVCJ9.eyJvayI6dHJ1ZSwiaWF0IjoxNTAxOTY2MjY5fQ.Udcna0ETPpRw5m3po3COjicb_cGJvgtnoLZyLnftaaI'
+// eyJhbGciOiJIUzI1NiIsInR5cCI6IkpXVCJ9.eyJ1c2VySWQiOjk5LCJ1c2VybmFtZSI6InVzZXIifQ.zeTCbWm2-Lpkoityi6Zll6vX8Ahs2x1J0Jp0tbPp_G0
 ```
 
-This JWT is protected from tampering, because it is signed. The payload and header are base64 encoded (to reduce the length), but they can easily be converted back to plain text- **their contents are not secret**. So **do not store sensitive user information in a JWT being sent as a cookie**, such as bank balance, DOB etc. To protect the information from being read, you would need to encrypt it, but in general, it is advised to **never store sensitive data on a cookie.**
+This JWT is protected from tampering, because it is signed. The payload and header are base64url encoded (to reduce the length and makes it easy to process "parts", since the part-separator ('.') is guaranteed to not occur inside the parts themselves), but they can easily be converted back to plain text- **their contents are not secret**. So **do not store sensitive user information in a JWT being sent as a cookie**, such as bank balance, DOB etc. To protect the information from being read, you would need to encrypt it, but in general, it is advised to **never store sensitive data on a cookie.**
 
 ---
 
@@ -186,7 +189,7 @@ You will see that `index.html` has three buttons, now you must implement the JWT
 | ------------- | ---------------------------------------------------------------------------------------------------------------------------------- |
 | `/login`      | Should create a cookie using `jwt.sign`, attach it to the response, and redirect to `/`                                            |
 | `/logout`     | Should remove the cookie and redirect to `/`                                                                                       |
-| `/auth_check` | Should check if the cookie exists, validate it with `jwt.verify`, and send back a 200 or 401 response with an informative message! |
+| `/auth-check` | Should check if the cookie exists, validate it with `jwt.verify`, and send back a 200 or 401 response with an informative message! |
 
 ## optional extra exercise 2- implement a HMAC
 
